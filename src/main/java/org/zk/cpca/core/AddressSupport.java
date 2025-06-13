@@ -13,7 +13,7 @@ public class AddressSupport {
     static {
         // 构建省/市级简称正则
         StringBuilder sb = new StringBuilder();
-        for (String abbr : ShortNameDict.getAbbrMap().keySet()) {
+        for (String abbr : ShortNameDict.getShortNameMap().keySet()) {
             if (sb.length() > 0) {
                 sb.append("|");
             }

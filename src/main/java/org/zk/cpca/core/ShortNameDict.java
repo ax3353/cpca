@@ -63,11 +63,11 @@ public class ShortNameDict {
     /**
      * 根据简称或全称获取全称
      */
-    public static String toFullName(String abbrOrFull) {
-        return SHORT_TO_FULL.getOrDefault(abbrOrFull, abbrOrFull);
+    public static String toFullName(String shortOrFull) {
+        return SHORT_TO_FULL.getOrDefault(shortOrFull, shortOrFull);
     }
 
-    public static Map<String, String> getAbbrMap() {
+    public static Map<String, String> getShortNameMap() {
         return SHORT_TO_FULL;
     }
 }

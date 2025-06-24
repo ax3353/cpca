@@ -155,38 +155,62 @@ public class AddressParser {
             return allResults;
         }
 
-        // 提取所有匹配到的关键词
         Set<String> matchedKeywords = matches.stream()
                 .map(AhoCorasickAutomaton.MatchResult::getKeyword)
                 .collect(Collectors.toSet());
 
-        // 计算每个结果的匹配度
+        // 构建得分 + 完整性标志
         List<ScoredResult> scoredResults = new ArrayList<>();
         for (ParseResult result : allResults) {
             int score = calculateMatchScore(result, matchedKeywords);
-            scoredResults.add(new ScoredResult(result, score));
+            boolean isComplete = isCompleteChain(result);
+            int matchedLength = calculateMatchedLength(result, matches);
+            scoredResults.add(new ScoredResult(result, score, matchedLength, isComplete));
         }
 
-        // 按分数排序，分数高的优先
-        scoredResults.sort((a, b) -> Integer.compare(b.score, a.score));
+        // 排序策略：完整链 > 分数 > 匹配长度
+        scoredResults.sort((a, b) -> {
+            // 完整优先
+            if (a.complete != b.complete) {
+                return Boolean.compare(b.complete, a.complete);
+            }
 
-        // 如果最高分的结果有多个，返回所有最高分结果
-        if (scoredResults.isEmpty()) {
-            return Collections.emptyList();
+            int cmp = Integer.compare(b.score, a.score);
+            if (cmp != 0) {
+                return cmp;
+            }
+            return Integer.compare(b.length, a.length);
+        });
+
+        int bestScore = scoredResults.get(0).score;
+        boolean bestComplete = scoredResults.get(0).complete;
+        int bestLength = scoredResults.get(0).length;
+
+        return scoredResults.stream()
+                .filter(sr -> sr.complete == bestComplete && sr.score == bestScore && sr.length == bestLength)
+                .map(sr -> sr.result)
+                .collect(Collectors.toList());
+    }
+
+    private boolean isCompleteChain(ParseResult result) {
+        return result.getProvince() != null && result.getCity() != null && result.getArea() != null;
+    }
+
+    private int calculateMatchedLength(ParseResult result, List<AhoCorasickAutomaton.MatchResult> matches) {
+        int total = 0;
+        for (AhoCorasickAutomaton.MatchResult match : matches) {
+            if (match.getKeyword() == null) {
+                continue;
+            }
+
+            if (match.getKeyword().equals(result.getProvince())
+                    || match.getKeyword().equals(result.getCity())
+                    || match.getKeyword().equals(result.getArea())
+                    || match.getKeyword().equals(result.getTown())) {
+                total += (match.getEnd() - match.getStart());
+            }
         }
-
-        int maxScore = scoredResults.get(0).score;
-
-        // 如果最高分大于1（说明有层级关系匹配），只返回最高分的结果
-        if (maxScore > 1) {
-            return scoredResults.stream()
-                    .filter(sr -> sr.score == maxScore)
-                    .map(sr -> sr.result)
-                    .collect(Collectors.toList());
-        }
-
-        // 否则返回所有结果
-        return allResults;
+        return total;
     }
 
     /**
@@ -257,10 +281,14 @@ public class AddressParser {
     private static class ScoredResult {
         final ParseResult result;
         final int score;
+        final int length;
+        final boolean complete;
 
-        ScoredResult(ParseResult result, int score) {
+        ScoredResult(ParseResult result, int score, int length, boolean complete) {
             this.result = result;
             this.score = score;
+            this.length = length;
+            this.complete = complete;
         }
     }
 }

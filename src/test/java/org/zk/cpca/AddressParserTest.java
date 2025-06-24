@@ -83,6 +83,21 @@ public class AddressParserTest {
     }
 
     /**
+     * 简单测试
+     */
+    @Test
+    void testAddress() {
+        List<ParseResult> results = parser.parse("长泰县兴泰开发区");
+        Assertions.assertEquals(1, results.size());
+
+        ParseResult result = results.get(0);
+        Assertions.assertEquals(result.getProvince(), "福建省");
+        Assertions.assertEquals(result.getCity(), "漳州市");
+        Assertions.assertEquals(result.getArea(), "长泰县");
+        Assertions.assertNull(result.getTown());
+    }
+
+    /**
      * 测试所有
      */
     @Test
@@ -91,5 +106,6 @@ public class AddressParserTest {
         testPartialAddress();
         testWithFilter();
         testShortAddress();
+        testAddress();
     }
 }

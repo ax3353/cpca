@@ -27,7 +27,6 @@ public class AddressParser {
     private final AddressIndex addressIndex;
     private final AhoCorasickAutomaton automaton;
 
-    // 构造函数保持不变...
     public AddressParser() {
         this(DEFAULT_JSON_FILE);
     }

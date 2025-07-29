@@ -7,8 +7,6 @@ import org.zk.cpca.core.AddressParser;
 import org.zk.cpca.core.FilterCondition;
 import org.zk.cpca.model.ParseResult;
 
-import java.util.List;
-
 /**
  * 测试用例
  *
@@ -28,23 +26,11 @@ public class AddressParserTest {
      */
     @Test
     void testCompleteAddress() {
-        List<ParseResult> results = parser.parse("湖北省黄石市下陆区团城山");
-        Assertions.assertEquals(1, results.size());
-
-        ParseResult result = results.get(0);
+        ParseResult result = parser.parse("湖北省黄石市下陆区团城山");
         Assertions.assertEquals(result.getProvince(), "湖北省");
         Assertions.assertEquals(result.getCity(), "黄石市");
         Assertions.assertEquals(result.getArea(), "下陆区");
         Assertions.assertNull(result.getTown());
-    }
-
-    /**
-     * 部分地址测试，由于全国有6个‘保安镇’，因此会解析出6个省市区镇出来
-     */
-    @Test
-    void testPartialAddress() {
-        List<ParseResult> results = parser.parse("保安镇大王村");
-        Assertions.assertEquals(6, results.size());
     }
 
     /**
@@ -56,10 +42,7 @@ public class AddressParserTest {
         FilterCondition filter = new FilterCondition();
         filter.setCity("平顶山市");
 
-        List<ParseResult> results = parser.parse("保安镇大王村", filter);
-        Assertions.assertEquals(1, results.size());
-
-        ParseResult result = results.get(0);
+        ParseResult result = parser.parse("保安镇大王村", filter);
         Assertions.assertEquals(result.getProvince(), "河南省");
         Assertions.assertEquals(result.getCity(), "平顶山市");
         Assertions.assertEquals(result.getArea(), "叶县");
@@ -72,10 +55,7 @@ public class AddressParserTest {
      */
     @Test
     void testShortAddress() {
-        List<ParseResult> results = parser.parse("新疆伊犁霍尔果斯市");
-        Assertions.assertEquals(1, results.size());
-
-        ParseResult result = results.get(0);
+        ParseResult result = parser.parse("新疆伊犁霍尔果斯市");
         Assertions.assertEquals(result.getProvince(), "新疆维吾尔自治区");
         Assertions.assertEquals(result.getCity(), "伊犁哈萨克自治州");
         Assertions.assertEquals(result.getArea(), "霍尔果斯市");
@@ -87,10 +67,7 @@ public class AddressParserTest {
      */
     @Test
     void testAddress() {
-        List<ParseResult> results = parser.parse("长泰县兴泰开发区");
-        Assertions.assertEquals(1, results.size());
-
-        ParseResult result = results.get(0);
+        ParseResult result = parser.parse("长泰县兴泰开发区");
         Assertions.assertEquals(result.getProvince(), "福建省");
         Assertions.assertEquals(result.getCity(), "漳州市");
         Assertions.assertEquals(result.getArea(), "长泰县");
@@ -103,9 +80,21 @@ public class AddressParserTest {
     @Test
     void testAll() {
         testCompleteAddress();
-        testPartialAddress();
         testWithFilter();
         testShortAddress();
         testAddress();
+
+        System.out.println(parser.parse("吉林省洮南市经济技术开发区经开大厦408室"));
+        System.out.println(parser.parse("前郭县巴特尔社区文贸委房屋开发93-1号楼5单元102室"));
+        System.out.println(parser.parse("保安镇大王村"));
+        System.out.println(parser.parse("合肥市包河经济开发区乌鲁木齐路389号4栋101室"));
+        System.out.println(parser.parse("威海市重庆街112号"));
+        System.out.println(parser.parse("日照市经济开发区上海路556号3楼303室"));
+        System.out.println(parser.parse("内蒙古鄂托克前旗上海庙镇特布德嘎查1社"));
+        System.out.println(parser.parse("长沙市雨花区韶山南路633号上海城19栋2612"));
+        System.out.println(parser.parse("龙潭区靠山街"));
+        System.out.println(parser.parse("敦化市胜利街城西工业园区"));
+        System.out.println(parser.parse("吉林省吉林开发区"));
+        System.out.println(parser.parse("山东省日照市经济开发区北京路街道银川路与天津路交界处南100米"));
     }
 }
